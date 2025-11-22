@@ -67,6 +67,9 @@ class BreakerApp(ctk.CTk):
         
         # System Tray Setup
         self.protocol("WM_DELETE_WINDOW", self.minimize_to_tray)
+        
+        # Auto-start timer on launch
+        self.toggle_timer()
 
     def setup_timer_tab(self):
         frame = self.tab_timer

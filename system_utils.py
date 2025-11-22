@@ -23,13 +23,16 @@ class AutoStarter:
         try:
             key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_ALL_ACCESS)
             if enable:
-                # Use pythonw.exe to run without console if possible, or just python.exe
-                # Assuming we are running from source for now.
-                # Ideally, this points to the executable if frozen, or python script if not.
-                exe_path = sys.executable
-                script_path = os.path.abspath("main.py")
-                # Command: "python.exe" "path/to/main.py" --minimized
-                cmd = f'"{exe_path}" "{script_path}" --minimized'
+                if getattr(sys, 'frozen', False):
+                    # Running as compiled exe
+                    exe_path = sys.executable
+                    cmd = f'"{exe_path}" --minimized'
+                else:
+                    # Running from source
+                    exe_path = sys.executable
+                    script_path = os.path.abspath("main.py")
+                    cmd = f'"{exe_path}" "{script_path}" --minimized'
+                
                 winreg.SetValueEx(key, self.APP_NAME, 0, winreg.REG_SZ, cmd)
             else:
                 try:
