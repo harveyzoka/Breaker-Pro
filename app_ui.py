@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from timer_logic import Timer
-from overlay_window import OverlayWindow
+from overlay_window import OverlayManager
 from system_utils import AutoStarter
 from settings_manager import SettingsManager
 import threading
@@ -252,11 +252,43 @@ class BreakerApp(ctk.CTk):
         if self.overlay and self.overlay.winfo_exists():
             self.overlay.update_time(remaining_seconds)
 
+    def on_idle_reset(self):
+        print("Timer reset due to idle.")
+
+    def on_timer_finish(self, new_mode):
+        threading.Thread(target=self.play_notification_sound).start()
+        
+        self.update_ui_mode()
+        
+        if new_mode == "Transition":
+            msg = self.sit_msg.get() if self.timer.next_mode == "Sitting" else self.stand_msg.get()
+            if self.strict_mode.get():
+                self.show_overlay(msg, self.timer.current_duration)
+        else:
+            if self.overlay and self.overlay.winfo_exists():
+                self.overlay.destroy()
+
+    def show_overlay(self, message, duration):
+        if self.overlay and self.overlay.winfo_exists():
+            self.overlay.destroy()
+            
+        alpha = self.overlay_alpha.get()
+        self.overlay = OverlayManager(message=message, duration=duration, alpha=alpha, on_unlock=self.on_overlay_unlock)
+
+    def on_overlay_unlock(self):
+        pass
+
     def update_tray_menu(self, status_text):
         if self.tray_icon:
             # Recreate menu with new status
             self.tray_icon.menu = pystray.Menu(
                 pystray.MenuItem(status_text, lambda i, it: None, enabled=False),
+                pystray.MenuItem("Show", self.show_window),
+                pystray.MenuItem("Quit", self.quit_app)
+            )
+
+    def update_ui_mode(self):
+        mode = self.timer.mode
         if mode == "Sitting":
             self.status_label.configure(text="SITTING TIME", text_color="#A0A0A0")
             self.progress_bar.configure(progress_color="#1f6aa5")
