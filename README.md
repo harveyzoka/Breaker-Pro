@@ -2,7 +2,7 @@
 
 Breaker Pro is a modern, advanced timer application designed to help you maintain a healthy balance between sitting and standing while working. Built with Python and CustomTkinter, it features a sleek dark UI, customizable schedules, and strict enforcement modes.
 
-![Breaker App Screenshot](https://via.placeholder.com/800x500?text=Breaker+App+Screenshot)
+![Breaker App Screenshot](screenshot.png)
 
 ## Features
 

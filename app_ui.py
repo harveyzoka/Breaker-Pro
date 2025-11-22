@@ -226,6 +226,22 @@ class BreakerApp(ctk.CTk):
         if total > 0:
             self.progress_bar.set(remaining_seconds / total)
             
+        # Update Tray Icon Title
+        if self.tray_icon:
+            try:
+                # Get idle time
+                idle_sec = self.timer.idle_monitor.get_idle_duration()
+                idle_min = int(idle_sec // 60)
+                
+                mode_str = self.timer.mode
+                if mode_str == "Transition":
+                    mode_str = "Prep"
+                
+                title = f"{mode_str}: {time_str} | Idle: {idle_min}m"
+                self.tray_icon.title = title
+            except Exception:
+                pass
+
         if self.overlay and self.overlay.winfo_exists():
             self.overlay.update_time(remaining_seconds)
 
