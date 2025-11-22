@@ -3,3 +3,4 @@ playsound==1.2.2
 Pillow
 pywin32
 pystray
+screeninfo
