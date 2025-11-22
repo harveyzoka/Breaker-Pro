@@ -242,19 +242,21 @@ class BreakerApp(ctk.CTk):
                 
                 title = f"{mode_str}: {time_str} | Idle: {idle_min}m"
                 self.tray_icon.title = title
-                
-                # Also update the first menu item (Status)
-                # pystray menus are immutable-ish, but we can try to replace it or just rely on title.
-                # Actually, updating menu dynamically is harder in pystray. 
-                # Let's stick to title (tooltip) which is standard.
-                # But user said "xem ở khay hệ thống", maybe they mean the menu?
-                # Let's try to recreate the menu? No, that flickers.
-                # Let's just trust the tooltip for now, as it's the standard way.
+                self.update_tray_menu(title)
             except Exception:
                 pass
 
         if self.overlay and self.overlay.winfo_exists():
             self.overlay.update_time(remaining_seconds)
+
+    def update_tray_menu(self, status_text):
+        if self.tray_icon:
+            # Recreate menu with new status
+            self.tray_icon.menu = pystray.Menu(
+                pystray.MenuItem(status_text, lambda i, it: None, enabled=False),
+                pystray.MenuItem("Show", self.show_window),
+                pystray.MenuItem("Quit", self.quit_app)
+            )
 
     def on_idle_reset(self):
         print("Timer reset due to idle.")
