@@ -12,11 +12,11 @@ class SingleOverlay(ctk.CTkToplevel):
         self.title("Breaker - Overlay")
         
         # Position window on specific monitor
-        self.geometry(f"{monitor.width}x{monitor.height}+{monitor.x}+{monitor.y}")
-        
-        self.attributes("-fullscreen", True)
-        self.attributes("-topmost", True)
+        # Note: On Windows, overrideredirect + geometry is the way to target specific monitors.
+        # Do NOT use -fullscreen attribute as it may force to primary.
         self.overrideredirect(True)
+        self.geometry(f"{monitor.width}x{monitor.height}+{monitor.x}+{monitor.y}")
+        self.attributes("-topmost", True)
         self.configure(fg_color="#000000")
         self.attributes("-alpha", alpha)
 
