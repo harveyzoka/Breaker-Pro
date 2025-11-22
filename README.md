@@ -25,8 +25,8 @@ Breaker Pro is a modern, advanced timer application designed to help you maintai
 ### Option 2: Run from Source
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/breaker-app.git
-   cd breaker-app
+   git clone https://github.com/harveyzoka/Breaker-Pro.git
+   cd Breaker-Pro
    ```
 2. Create a virtual environment and install dependencies:
    ```bash
