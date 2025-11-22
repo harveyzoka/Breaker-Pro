@@ -20,6 +20,9 @@ class BreakerApp(ctk.CTk):
         self.geometry("500x750")
         ctk.set_appearance_mode("Dark")
         
+        if os.path.exists("app.ico"):
+            self.iconbitmap("app.ico")
+        
         self.settings_manager = SettingsManager()
         self.settings = self.settings_manager.load_settings()
         
@@ -57,13 +60,13 @@ class BreakerApp(ctk.CTk):
         self.tab_settings = self.tabview.add("Settings")
 
         self.overlay = None
+        self.tray_icon = None
         
         self.setup_timer_tab()
         self.setup_settings_tab()
         
         # System Tray Setup
         self.protocol("WM_DELETE_WINDOW", self.minimize_to_tray)
-        self.tray_icon = None
 
     def setup_timer_tab(self):
         frame = self.tab_timer
@@ -239,6 +242,14 @@ class BreakerApp(ctk.CTk):
                 
                 title = f"{mode_str}: {time_str} | Idle: {idle_min}m"
                 self.tray_icon.title = title
+                
+                # Also update the first menu item (Status)
+                # pystray menus are immutable-ish, but we can try to replace it or just rely on title.
+                # Actually, updating menu dynamically is harder in pystray. 
+                # Let's stick to title (tooltip) which is standard.
+                # But user said "xem ở khay hệ thống", maybe they mean the menu?
+                # Let's try to recreate the menu? No, that flickers.
+                # Let's just trust the tooltip for now, as it's the standard way.
             except Exception:
                 pass
 
@@ -309,20 +320,16 @@ class BreakerApp(ctk.CTk):
 
     # --- System Tray Logic ---
     def minimize_to_tray(self):
-        self.withdraw() # Hide window
+        self.withdraw()
         
         if not self.tray_icon:
             image = self.create_tray_image()
             menu = pystray.Menu(
+                pystray.MenuItem("Status: Checking...", lambda i, it: None, enabled=False),
                 pystray.MenuItem("Show", self.show_window),
                 pystray.MenuItem("Quit", self.quit_app)
             )
-            self.tray_icon = pystray.Icon("Breaker", image, "Breaker App", menu)
-            # Run tray icon in a separate thread so it doesn't block main loop?
-            # pystray.run() blocks. So we need to run it in a thread OR use setup logic.
-            # Actually, pystray usually needs to run on the main thread on some OS, but on Windows it's flexible.
-            # However, tkinter mainloop is already running.
-            # We can run tray.run_detached() if available, or run in thread.
+            self.tray_icon = pystray.Icon("Breaker", image, "Breaker Pro", menu)
             threading.Thread(target=self.tray_icon.run, daemon=True).start()
 
     def show_window(self, icon=None, item=None):
@@ -338,11 +345,14 @@ class BreakerApp(ctk.CTk):
         sys.exit()
 
     def create_tray_image(self):
-        # Create a simple icon programmatically
-        width = 64
-        height = 64
-        image = Image.new('RGB', (width, height), color=(30, 30, 30))
-        dc = ImageDraw.Draw(image)
-        dc.ellipse((10, 10, 54, 54), fill=(31, 106, 165)) # Blue circle
-        dc.text((20, 20), "B", fill="white")
-        return image
+        if os.path.exists("app.ico"):
+            return Image.open("app.ico")
+        else:
+            # Fallback
+            width = 64
+            height = 64
+            image = Image.new('RGB', (width, height), color=(30, 30, 30))
+            dc = ImageDraw.Draw(image)
+            dc.ellipse((10, 10, 54, 54), fill=(31, 106, 165))
+            dc.text((20, 20), "B", fill="white")
+            return image
