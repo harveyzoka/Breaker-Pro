@@ -20,13 +20,10 @@ class SingleOverlay(ctk.CTkToplevel):
         self.configure(fg_color="#000000")
         self.attributes("-alpha", alpha)
 
-        if is_primary:
-            self.setup_primary_ui(message, duration)
-        else:
-            # Blank black screen for secondary monitors
-            pass
+        # Setup UI for ALL monitors
+        self.setup_ui(message, duration)
 
-    def setup_primary_ui(self, message, duration):
+    def setup_ui(self, message, duration):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
@@ -44,10 +41,10 @@ class SingleOverlay(ctk.CTkToplevel):
         return f"{mins:02}:{secs:02}"
 
     def update_time(self, remaining):
-        if self.is_primary:
-            self.timer_label.configure(text=self.format_time(remaining))
-            if remaining <= 0:
-                self.unlock()
+        # Update UI on ALL monitors
+        self.timer_label.configure(text=self.format_time(remaining))
+        if remaining <= 0:
+            self.unlock()
 
     def unlock(self):
         if self.on_unlock:
