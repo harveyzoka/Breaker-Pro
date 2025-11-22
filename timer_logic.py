@@ -34,8 +34,9 @@ class Timer:
     def start(self):
         if not self.is_running:
             self.is_running = True
-            self._stop_event.clear()
-            self._thread = threading.Thread(target=self._run)
+            # Create a NEW event for this run session to avoid race conditions with old threads
+            self._stop_event = threading.Event()
+            self._thread = threading.Thread(target=self._run, args=(self._stop_event,))
             self._thread.daemon = True
             self._thread.start()
 
@@ -123,11 +124,11 @@ class Timer:
                 
         return False
 
-    def _run(self):
-        while self.is_running and not self._stop_event.is_set():
+    def _run(self, stop_event):
+        while self.is_running and not stop_event.is_set():
             time.sleep(1)
             
-            if not self.is_running or self._stop_event.is_set():
+            if not self.is_running or stop_event.is_set():
                 break
 
             # 1. Check Work Hours (Only if NOT in transition - force transition to finish?)
