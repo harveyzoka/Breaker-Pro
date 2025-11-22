@@ -180,14 +180,25 @@ class BreakerApp(ctk.CTk):
             self.start_button.configure(text="PAUSE", fg_color="#E59400")
 
     def skip_timer(self):
+        was_running = self.timer.is_running
         self.timer.skip()
         self.update_ui_mode()
-        self.start_button.configure(text="START", fg_color="#1f6aa5")
+        
+        if was_running:
+            self.timer.start()
+            self.start_button.configure(text="PAUSE", fg_color="#E59400")
+        else:
+            self.start_button.configure(text="START", fg_color="#1f6aa5")
 
     def reset_timer(self):
         self.timer.reset()
         self.start_button.configure(text="START", fg_color="#1f6aa5")
         self.progress_bar.set(1.0)
+
+    def browse_sound(self):
+        filename = filedialog.askopenfilename(filetypes=[("Audio Files", "*.mp3 *.wav")])
+        if filename:
+            self.sound_path.set(filename)
 
     def apply_settings(self):
         try:
@@ -224,6 +235,10 @@ class BreakerApp(ctk.CTk):
         self.auto_starter.set_autostart(self.auto_start.get())
 
     def update_timer_display(self, remaining_seconds):
+        # Ensure this runs on main thread
+        self.after(0, lambda: self._update_timer_display_safe(remaining_seconds))
+
+    def _update_timer_display_safe(self, remaining_seconds):
         mins, secs = divmod(remaining_seconds, 60)
         time_str = f"{mins:02}:{secs:02}"
         self.timer_label.configure(text=time_str)
@@ -256,6 +271,10 @@ class BreakerApp(ctk.CTk):
         print("Timer reset due to idle.")
 
     def on_timer_finish(self, new_mode):
+        # Ensure this runs on main thread
+        self.after(0, lambda: self._on_timer_finish_safe(new_mode))
+
+    def _on_timer_finish_safe(self, new_mode):
         threading.Thread(target=self.play_notification_sound).start()
         
         self.update_ui_mode()

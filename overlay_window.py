@@ -15,10 +15,21 @@ class SingleOverlay(ctk.CTkToplevel):
         # Note: On Windows, overrideredirect + geometry is the way to target specific monitors.
         # Do NOT use -fullscreen attribute as it may force to primary.
         self.overrideredirect(True)
-        self.geometry(f"{monitor.width}x{monitor.height}+{monitor.x}+{monitor.y}")
+        
+        # Ensure integers
+        x = int(monitor.x)
+        y = int(monitor.y)
+        w = int(monitor.width)
+        h = int(monitor.height)
+        
+        self.geometry(f"{w}x{h}+{x}+{y}")
         self.attributes("-topmost", True)
         self.configure(fg_color="#000000")
         self.attributes("-alpha", alpha)
+        
+        # Force update geometry after a short delay to handle OS lag
+        self.after(100, lambda: self.geometry(f"{w}x{h}+{x}+{y}"))
+        self.after(100, lambda: self.attributes("-topmost", True))
 
         # Setup UI for ALL monitors
         self.setup_ui(message, duration)
