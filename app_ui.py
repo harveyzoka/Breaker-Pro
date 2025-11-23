@@ -20,12 +20,11 @@ class BreakerApp(ctk.CTk):
         self.geometry("500x750")
         ctk.set_appearance_mode("Dark")
         
+        self.tray_icon = None
+        self.overlay = None
+        
         if os.path.exists("app.ico"):
             self.iconbitmap("app.ico")
-            
-        # Check for minimized start
-        if "--minimized" in sys.argv:
-            self.minimize_to_tray()
         
         self.settings_manager = SettingsManager()
         self.settings = self.settings_manager.load_settings()
@@ -73,7 +72,11 @@ class BreakerApp(ctk.CTk):
         self.protocol("WM_DELETE_WINDOW", self.minimize_to_tray)
         
         # Auto-start timer on launch
-        self.toggle_timer()
+        # Check for minimized start
+        if "--minimized" in sys.argv:
+            self.minimize_to_tray()
+            
+        self.toggle_timer() # Always start timer on launch
 
     def setup_timer_tab(self):
         frame = self.tab_timer
