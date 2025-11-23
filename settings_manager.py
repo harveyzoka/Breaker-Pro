@@ -1,6 +1,8 @@
 import json
 import os
+import sys
 
+class SettingsManager:
     def __init__(self):
         self.FILE_PATH = self._get_settings_path()
 
