@@ -29,10 +29,12 @@ class AutoStarter:
                     cmd = f'"{exe_path}" --minimized'
                 else:
                     # Running from source
+                    # Use sys.executable (python.exe) and the absolute path to main.py
                     exe_path = sys.executable
-                    script_path = os.path.abspath("main.py")
+                    script_path = os.path.abspath(sys.argv[0]) # Use argv[0] to get main.py path reliably
                     cmd = f'"{exe_path}" "{script_path}" --minimized'
                 
+                print(f"Setting Autostart: {cmd}") # Debug print
                 winreg.SetValueEx(key, self.APP_NAME, 0, winreg.REG_SZ, cmd)
             else:
                 try:
