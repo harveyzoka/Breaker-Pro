@@ -22,6 +22,10 @@ class BreakerApp(ctk.CTk):
         
         if os.path.exists("app.ico"):
             self.iconbitmap("app.ico")
+            
+        # Check for minimized start
+        if "--minimized" in sys.argv:
+            self.minimize_to_tray()
         
         self.settings_manager = SettingsManager()
         self.settings = self.settings_manager.load_settings()
