@@ -23,8 +23,16 @@ class BreakerApp(ctk.CTk):
         self.tray_icon = None
         self.overlay = None
         
-        if os.path.exists("app.ico"):
-            self.iconbitmap("app.ico")
+        # Determine base path for resources
+        if getattr(sys, 'frozen', False):
+            base_path = os.path.dirname(sys.executable)
+        else:
+            base_path = os.path.dirname(os.path.abspath(__file__))
+            
+        icon_path = os.path.join(base_path, "app.ico")
+        
+        if os.path.exists(icon_path):
+            self.iconbitmap(icon_path)
         
         self.settings_manager = SettingsManager()
         self.settings = self.settings_manager.load_settings()

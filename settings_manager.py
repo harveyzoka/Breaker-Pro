@@ -1,8 +1,17 @@
 import json
 import os
 
-class SettingsManager:
-    FILE_PATH = "settings.json"
+    def __init__(self):
+        self.FILE_PATH = self._get_settings_path()
+
+    def _get_settings_path(self):
+        if getattr(sys, 'frozen', False):
+            # Running as compiled exe
+            base_path = os.path.dirname(sys.executable)
+        else:
+            # Running from source
+            base_path = os.path.dirname(os.path.abspath(__file__))
+        return os.path.join(base_path, "settings.json")
     
     DEFAULT_SETTINGS = {
         "sitting_duration": 25,
