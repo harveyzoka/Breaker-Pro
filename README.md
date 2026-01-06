@@ -72,3 +72,6 @@ The output file will be in the `dist/` folder.
 
 ## License
 MIT License
+
+## Contributing
+Contributions are welcome! Please feel free to submit a Pull Request.
