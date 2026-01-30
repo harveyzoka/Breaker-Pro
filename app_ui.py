@@ -249,19 +249,37 @@ class BreakerApp(ctk.CTk):
     def toggle_autostart(self):
         self.auto_starter.set_autostart(self.auto_start.get())
 
-    def update_timer_display(self, remaining_seconds):
+    def update_timer_display(self, remaining_seconds, status_text=""):
         # Ensure this runs on main thread
-        self.after(0, lambda: self._update_timer_display_safe(remaining_seconds))
+        self.after(0, lambda: self._update_timer_display_safe(remaining_seconds, status_text))
 
-    def _update_timer_display_safe(self, remaining_seconds):
+    def _update_timer_display_safe(self, remaining_seconds, status_text):
         mins, secs = divmod(remaining_seconds, 60)
-        time_str = f"{mins:02}:{secs:02}"
+        time_str = f"{int(mins):02d}:{int(secs):02d}"
         self.timer_label.configure(text=time_str)
         
-        total = self.timer.current_duration
-        if total > 0:
-            self.progress_bar.set(remaining_seconds / total)
+        # Update progress bar
+        if self.timer.mode == "Sitting":
+            total = self.timer.sitting_duration * 60
+            self.status_label.configure(text="SITTING TIME", text_color="#A0A0A0")
+        elif self.timer.mode == "Standing":
+            total = self.timer.standing_duration * 60
+            self.status_label.configure(text="STANDING TIME", text_color="#A0A0A0")
+        else: # Transition
+            total = self.timer.transition_duration
+            self.status_label.configure(text="TRANSITION", text_color="#E59400")
             
+        progress = remaining_seconds / total if total > 0 else 0
+        self.progress_bar.set(progress)
+        
+        # Update Window Status if provided
+        if status_text:
+             self.title(f"Breaker - {status_text}")
+             if status_text == "Outside Work Hours":
+                 self.status_label.configure(text="OUTSIDE WORK HOURS", text_color="#FF5555")
+             elif status_text == "User Idle":
+                 self.status_label.configure(text="USER IDLE - PAUSED", text_color="#FFFF55")
+        
         # Update Tray Icon Title
         if self.tray_icon:
             try:

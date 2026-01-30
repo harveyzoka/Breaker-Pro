@@ -16,7 +16,8 @@ class Timer:
         self.current_duration = self.sitting_duration
         self.remaining_time = self.current_duration
         self.is_running = False
-        self.mode = "Sitting" # Sitting, Standing, Transition
+        self.mode = "Sitting" 
+        self.status_reason = "" # New status field
         self.next_mode = "Standing" # Used during transition
         
         # Advanced Settings
@@ -46,9 +47,6 @@ class Timer:
 
     def reset(self):
         self.pause()
-        # Reset to start of current main mode (skip transition if we were in it?)
-        # If in transition, maybe reset to the mode we were transitioning TO?
-        # Or just reset to Sitting. Let's reset to Sitting for simplicity or current main mode.
         if self.mode == "Transition":
             self.mode = self.next_mode
             
@@ -59,13 +57,13 @@ class Timer:
             
         self.remaining_time = self.current_duration
         if self.on_tick:
-            self.on_tick(self.remaining_time)
+            self.on_tick(self.remaining_time, "Reset")
 
     def skip(self):
         self.pause()
         self._switch_mode()
         if self.on_tick:
-            self.on_tick(self.remaining_time)
+            self.on_tick(self.remaining_time, "Skipped")
 
     def update_settings(self, sitting_minutes, standing_minutes, transition_seconds, schedules, idle_mins):
         self.sitting_duration = sitting_minutes * 60
@@ -131,9 +129,10 @@ class Timer:
             if not self.is_running or stop_event.is_set():
                 break
 
-            # 1. Check Work Hours (Only if NOT in transition - force transition to finish?)
-            # Or pause transition too? Let's pause everything outside work hours.
+            # 1. Check Work Hours
             if not self._is_within_work_hours():
+                if self.on_tick:
+                    self.on_tick(self.remaining_time, "Outside Work Hours")
                 continue
 
             # 2. Check Idle (Only in Sitting mode)
@@ -144,13 +143,13 @@ class Timer:
                     if self.on_idle_reset:
                         self.on_idle_reset()
                     if self.on_tick:
-                        self.on_tick(self.remaining_time)
+                        self.on_tick(self.remaining_time, "User Idle")
                     continue
 
             # 3. Countdown
             self.remaining_time -= 1
             if self.on_tick:
-                self.on_tick(self.remaining_time)
+                self.on_tick(self.remaining_time, "")
 
             if self.remaining_time <= 0:
                 self.is_running = False
