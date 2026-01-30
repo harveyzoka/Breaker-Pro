@@ -11,4 +11,6 @@ build/
 dist/
 
 # App Settings
+# App Settings
 settings.json
+python_dist/
