@@ -1,7 +1,9 @@
-# Core dependencies
+# UI and Audio
 customtkinter
 playsound==1.2.2
 Pillow
+
+# System integrations
 pywin32
 pystray
 screeninfo
