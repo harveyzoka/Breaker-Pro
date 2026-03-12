@@ -17,7 +17,7 @@ Breaker Pro is a modern, advanced timer application designed to help you maintai
 
 ## Installation
 
-### Option 1: Run form Executable (Windows)
+### Option 1: Run from Executable (Windows)
 1. Download the latest `Breaker.exe` from the [Releases](#) page.
 2. Run `Breaker.exe`.
 3. (Optional) Go to Settings -> Enable "Run on Startup".
