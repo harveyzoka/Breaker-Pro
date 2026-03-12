@@ -1,5 +1,6 @@
 # Breaker Pro - Sit/Stand Timer
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 Breaker Pro is a modern, advanced timer application designed to help you maintain a healthy balance between sitting and standing while working. Built with Python and CustomTkinter, it features a sleek dark UI, customizable schedules, and strict enforcement modes.
 
 ![Breaker App Screenshot](screenshot.png)
