@@ -44,7 +44,7 @@ class SingleOverlay(ctk.CTkToplevel):
         self.timer_label = ctk.CTkLabel(self, text=self.format_time(duration), font=("Roboto", 120, "bold"), text_color="#44AA44")
         self.timer_label.grid(row=1, column=0)
 
-        self.unlock_btn = ctk.CTkButton(self, text="Hold 5s to Emergency Unlock", fg_color="#333333", hover_color="#555555")
+        self.unlock_btn = ctk.CTkButton(self, text="Hold 5s to Emergency Unlock", fg_color="#333333", hover_color="#555555", width=350, height=60, font=("Roboto", 24, "bold"))
         self.unlock_btn.grid(row=2, column=0, pady=50)
 
         # Bind events for hold-to-unlock
