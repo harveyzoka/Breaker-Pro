@@ -44,8 +44,43 @@ class SingleOverlay(ctk.CTkToplevel):
         self.timer_label = ctk.CTkLabel(self, text=self.format_time(duration), font=("Roboto", 120, "bold"), text_color="#44AA44")
         self.timer_label.grid(row=1, column=0)
 
-        self.unlock_btn = ctk.CTkButton(self, text="Emergency Unlock", command=self.unlock, fg_color="#333333", hover_color="#555555")
+        self.unlock_btn = ctk.CTkButton(self, text="Hold 5s to Emergency Unlock", fg_color="#333333", hover_color="#555555")
         self.unlock_btn.grid(row=2, column=0, pady=50)
+
+        # Bind events for hold-to-unlock
+        self.unlock_btn.bind("<ButtonPress-1>", self.on_press)
+        self.unlock_btn.bind("<ButtonRelease-1>", self.on_release)
+        
+        self.hold_time = 0
+        self.hold_timer_id = None
+
+    def on_press(self, event):
+        self.hold_time = 0
+        self.unlock_btn.configure(text=f"Holding... {5 - self.hold_time}s", fg_color="#993333")
+        self.hold_timer_id = self.after(1000, self.check_hold)
+
+    def on_release(self, event):
+        if self.hold_timer_id:
+            self.after_cancel(self.hold_timer_id)
+            self.hold_timer_id = None
+        self.hold_time = 0
+        try:
+            self.unlock_btn.configure(text="Hold 5s to Emergency Unlock", fg_color="#333333")
+        except:
+            pass # Window might be destroyed
+
+    def check_hold(self):
+        self.hold_time += 1
+        
+        if self.hold_time >= 5:
+            self.unlock()
+            return
+            
+        try:
+            self.unlock_btn.configure(text=f"Holding... {5 - self.hold_time}s", fg_color="#993333")
+            self.hold_timer_id = self.after(1000, self.check_hold)
+        except:
+            pass # Window might be destroyed
 
     def format_time(self, seconds):
         mins, secs = divmod(seconds, 60)
